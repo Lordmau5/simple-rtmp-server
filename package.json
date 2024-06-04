@@ -1,0 +1,14 @@
+{
+	"name": "simple-rtmp-server",
+	"version": "1.0.0",
+	"description": "A simple RTMP server using NestJS, Vue and node-media-server",
+	"author": "Lordmau5",
+	"private": true,
+	"license": "GNU3",
+	"scripts": {
+		"setup:client": "cd client && npm install && npm run build",
+		"setup:server": "cd server && npm install && npm run build",
+		"setup": "npm run setup:client && npm run setup:server",
+		"start": "cd server && npm run start:prod"
+	}
+}
