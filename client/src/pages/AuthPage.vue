@@ -68,7 +68,7 @@
 import { useClipboard } from '@vueuse/core';
 import { api } from 'boot/axios';
 import {
-    computed, onMounted, ref,
+	computed, onMounted, ref,
 } from 'vue';
 
 const { copy } = useClipboard();
@@ -79,51 +79,51 @@ const auths = ref([]);
 const username = ref('');
 const submittingAuth = ref(false);
 const authRules = [
-    (text) => (text.length >= 4 && text.length <= 24) || 'Between 4 and 24 characters',
-    (text) => !regex.test(text) || 'Only alphanumerical characters (A-Z, a-z and 0-9)',
+	(text) => (text.length >= 4 && text.length <= 24) || 'Between 4 and 24 characters',
+	(text) => !regex.test(text) || 'Only alphanumerical characters (A-Z, a-z and 0-9)',
 ];
 
 const addAuthValid = computed(() => {
-    const usernames = Object.keys(auths.value);
+	const usernames = Object.keys(auths.value);
 
-    for (const authUsername of usernames) {
-        // Check if the username matches
-        if (authUsername.toLowerCase() === username.value.toLowerCase()) return false;
+	for (const authUsername of usernames) {
+		// Check if the username matches
+		if (authUsername.toLowerCase() === username.value.toLowerCase()) return false;
 
-        // Validate the username using authRules
-        for (const rule of authRules) {
-            if (rule(username.value) !== true) return false;
-        }
-    }
+		// Validate the username using authRules
+		for (const rule of authRules) {
+			if (rule(username.value) !== true) return false;
+		}
+	}
 
-    return true;
+	return true;
 });
 
 const fetchAuths = async () => {
-    const res = await api.get('auth');
-    auths.value = res.data;
-    console.log(auths.value);
+	const res = await api.get('auth');
+	auths.value = res.data;
+	console.log(auths.value);
 };
 
 const addAuth = async () => {
-    submittingAuth.value = true;
-    username.value = username.value.replace(regex, '');
+	submittingAuth.value = true;
+	username.value = username.value.replace(regex, '');
 
-    await api.post('auth', { username: username.value });
-    await fetchAuths();
+	await api.post('auth', { username: username.value });
+	await fetchAuths();
 
-    username.value = '';
-    submittingAuth.value = false;
+	username.value = '';
+	submittingAuth.value = false;
 };
 
 const copyAuth = (_username, _password) => {
-    copy(`${_username}?pass=${_password}`);
+	copy(`${_username}?pass=${_password}`);
 };
 
 const removeAuth = async (_username) => {
-    console.log(_username);
-    await api.delete(`auth/${_username}`);
-    await fetchAuths();
+	console.log(_username);
+	await api.delete(`auth/${_username}`);
+	await fetchAuths();
 };
 
 onMounted(() => fetchAuths());

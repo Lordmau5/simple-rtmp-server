@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { StreamsModule } from './streams/streams.module';
 import { ConfigModule } from '@nestjs/config';
 
-import * as Joi from 'joi';
+import Joi from 'joi';
 import { MediaServerModule } from 'src/media-server/media-server.module';
 
 @Module({
@@ -20,7 +20,7 @@ import { MediaServerModule } from 'src/media-server/media-server.module';
 				RTMP_PORT: Joi.number().required(),
 				NODE_ENV: Joi.string()
 					.valid('development', 'production')
-					.default('production'),
+					.default('development'),
 				PASSWORD: Joi.string().default('admin'),
 			}),
 			validationOptions: {

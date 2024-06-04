@@ -1,13 +1,17 @@
 import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Injectable()
-export class PasswordMiddleware implements NestMiddleware {	
-	use(req: Request, res: Response, next: NextFunction) {
+export class PasswordMiddleware implements NestMiddleware {
+	use(
+		req: FastifyRequest['raw'],
+		res: FastifyReply['raw'],
+		next: () => void,
+	) {
 		const password = req?.headers?.authorization || null;
-		
+
 		if (!password || password !== `Password ${process.env.PASSWORD}`) {
-			res.status(HttpStatus.UNAUTHORIZED).send();
+			res.writeHead(HttpStatus.UNAUTHORIZED, 'Invalid password').end();
 			return;
 		}
 

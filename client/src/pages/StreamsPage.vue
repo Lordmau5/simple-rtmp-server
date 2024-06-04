@@ -23,7 +23,7 @@
 
 <script setup>
 import {
-    onMounted, ref,
+	onMounted, ref,
 } from 'vue';
 import { api } from 'boot/axios';
 import { useClipboard } from '@vueuse/core';
@@ -33,15 +33,15 @@ const { copy } = useClipboard();
 const streams = ref([]);
 
 const fetchStreams = async () => {
-    const res = await api.get('streams');
-    streams.value = res.data;
+	const res = await api.get('streams');
+	streams.value = res.data;
 };
 
 const copyStream = (username) => {
-    copy(`rtmp://lordmau5.com/live/${username}`);
+	copy(`rtmp://lordmau5.com/live/${username}`);
 };
 
 onMounted(() => {
-    fetchStreams();
+	fetchStreams();
 });
 </script>

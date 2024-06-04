@@ -54,59 +54,59 @@ const appStore = useAppStore();
 const title = ref('RTMP');
 
 const linksList = [
-    {
-        title: 'Streams',
-        caption: 'Check who\'s live',
-        icon: 'tv',
-        to: '/',
-    },
-    {
-        title: 'Authorization',
-        caption: 'Check and generate stream keys',
-        icon: 'key',
-        to: '/authorization',
-    },
-    {
-        type: 'space',
-    },
-    {
-        title: 'Logout',
-        caption: 'Goodbye!',
-        icon: 'logout',
-        color: 'red',
-        func: () => appStore.logout(),
-    },
+	{
+		title: 'Streams',
+		caption: 'Check who\'s live',
+		icon: 'tv',
+		to: '/',
+	},
+	{
+		title: 'Authorization',
+		caption: 'Check and generate stream keys',
+		icon: 'key',
+		to: '/authorization',
+	},
+	{
+		type: 'space',
+	},
+	{
+		title: 'Logout',
+		caption: 'Goodbye!',
+		icon: 'logout',
+		color: 'red',
+		func: () => appStore.logout(),
+	},
 ];
 
 const words = {
-    r: [
-        'Rare', 'Rainy', 'Ragged', 'Raw', 'Randomized', 'Reachable', 'Reasonless',
-        'Red', 'Really', 'Renewed', 'Remaining',
-    ],
-    t: [
-        'Tactical', 'Tactful', 'Tainted', 'Taxing', 'Tangled', 'Taped', 'Talented',
-        'Technical', 'Tentactular', 'Terrible',
-    ],
-    m: [
-        'Main', 'Mainframe', 'Macho', 'Magenta', 'Match', 'Meal', 'Mesh',
-        'Music', 'Major', 'Milk', 'Mint', 'Mobile',
-    ],
-    p: [
-        'Potato', 'Partner', 'Peach', 'Pearl', 'Pet', 'Pilot', 'Poet', 'Prince',
-        'Parcel', 'Pencil', 'Piano', 'Pickaxe',
-    ],
+	r: [
+		'Rare', 'Rainy', 'Ragged', 'Raw', 'Randomized', 'Reachable', 'Reasonless',
+		'Red', 'Really', 'Renewed', 'Remaining',
+	],
+	t: [
+		'Tactical', 'Tactful', 'Tainted', 'Taxing', 'Tangled', 'Taped', 'Talented',
+		'Technical', 'Tentactular', 'Terrible',
+	],
+	m: [
+		'Main', 'Mainframe', 'Macho', 'Magenta', 'Match', 'Meal', 'Mesh',
+		'Music', 'Major', 'Milk', 'Mint', 'Mobile',
+	],
+	p: [
+		'Potato', 'Partner', 'Peach', 'Pearl', 'Pet', 'Pilot', 'Poet', 'Prince',
+		'Parcel', 'Pencil', 'Piano', 'Pickaxe',
+	],
 };
 
 const isAuthorized = computed(() => appStore.isAuthorized);
 
 onMounted(() => {
-    title.value = 'RTMP - ';
-    title.value = `${title.value}${words.r[Math.floor(Math.random() * words.r.length)]} `;
-    title.value = `${title.value}${words.t[Math.floor(Math.random() * words.t.length)]} `;
-    title.value = `${title.value}${words.m[Math.floor(Math.random() * words.m.length)]} `;
-    title.value = `${title.value}${words.p[Math.floor(Math.random() * words.p.length)]}`;
-    document.title = title.value;
+	title.value = 'RTMP - ';
+	title.value = `${title.value}${words.r[Math.floor(Math.random() * words.r.length)]} `;
+	title.value = `${title.value}${words.t[Math.floor(Math.random() * words.t.length)]} `;
+	title.value = `${title.value}${words.m[Math.floor(Math.random() * words.m.length)]} `;
+	title.value = `${title.value}${words.p[Math.floor(Math.random() * words.p.length)]}`;
+	document.title = title.value;
 
-    appStore.getUserData();
+	appStore.getUserData();
 });
 </script>

@@ -1,20 +1,31 @@
 <template>
     <div class="login-container">
-        <q-card class="login-box">
-            <q-input
-                v-model="password"
-                label="Password"
-                outlined
-                dense
-                type="password"
-            />
-            <div class="q-mt-md flex justify-center">
-                <q-btn
-                    label="Login"
-                    color="primary"
-                    @click="login"
-                />
-            </div>
+        <q-card style="min-width: 300px;">
+            <q-card-section>
+                <div class="text-h6">Test your might...</div>
+            </q-card-section>
+
+            <q-card-section>
+                <q-form
+                    @submit="login"
+                    class="q-gutter-md"
+                >
+                    <q-input
+                        v-model="password"
+                        label="Password"
+                        outlined
+                        dense
+                        type="password"
+                    />
+                    <div class="q-mt-md flex justify-center">
+                        <q-btn
+                            label="Login"
+                            color="primary"
+                            @click="login"
+                        />
+                    </div>
+                </q-form>
+            </q-card-section>
         </q-card>
     </div>
 </template>
@@ -28,11 +39,11 @@ const loginLoading = ref(false);
 const appStore = useAppStore();
 
 const login = async () => {
-    loginLoading.value = true;
+	loginLoading.value = true;
 
-    await appStore.login(password.value);
+	await appStore.login(password.value);
 
-    loginLoading.value = false;
+	loginLoading.value = false;
 };
 </script>
 
@@ -49,11 +60,11 @@ const login = async () => {
 }
 
 .login-box {
-    padding: 2rem;
+    /*padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     max-width: 400px;
-    width: 100%;
+    width: 100%;*/
 }
 
 @keyframes gradient-animation {
