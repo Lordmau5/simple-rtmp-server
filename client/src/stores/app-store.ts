@@ -18,6 +18,7 @@ export const useAppStore = defineStore('app', {
 			Cookies.set('password', password, {
 				expires: 7,
 				sameSite: 'None',
+				secure: import.meta.env.PROD, // true if in prod, false if in dev
 			});
 
 			await this.getUserData();
