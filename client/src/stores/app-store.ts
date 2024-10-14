@@ -15,10 +15,12 @@ export const useAppStore = defineStore('app', {
 	actions: {
 		async login(password: string) {
 			// Set password cookie, make it expire in 7 days
+			const isSecure = window.location.protocol === 'https:';
+
 			Cookies.set('password', password, {
 				expires: 7,
-				sameSite: 'None',
-				secure: import.meta.env.PROD, // true if in prod, false if in dev
+				sameSite: 'Lax',
+				secure: isSecure ? import.meta.env.PROD : false, // true if in prod, false if in dev
 			});
 
 			await this.getUserData();

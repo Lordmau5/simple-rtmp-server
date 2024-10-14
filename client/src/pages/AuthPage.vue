@@ -21,8 +21,21 @@
                     ></q-input>
                 </q-card-section>
 
+                <q-card-section>
+                    <q-input
+                        label="Copy (if button doesn't work)"
+                        filled
+                        :model-value="getAuthForCopy(username, password)"
+                        @focus="(event) => event.target.select()"
+                        @update:model-value="() => {}"
+                    ></q-input>
+                </q-card-section>
+
                 <q-card-actions align="right" class="q-mt-auto q-mx-sm">
-                    <q-btn color="primary" @click="copyAuth(username, password)">
+                    <q-btn
+                        color="primary"
+                        @click="copyAuth(username, password)"
+                    >
                         Copy To Clipboard
                     </q-btn>
                     <q-space></q-space>
@@ -102,7 +115,6 @@ const addAuthValid = computed(() => {
 const fetchAuths = async () => {
 	const res = await api.get('auth');
 	auths.value = res.data;
-	console.log(auths.value);
 };
 
 const addAuth = async () => {
@@ -116,12 +128,13 @@ const addAuth = async () => {
 	submittingAuth.value = false;
 };
 
+const getAuthForCopy = (_username, _password) => `${_username}?pass=${_password}`;
+
 const copyAuth = (_username, _password) => {
-	copy(`${_username}?pass=${_password}`);
+	copy(getAuthForCopy(_username, _password));
 };
 
 const removeAuth = async (_username) => {
-	console.log(_username);
 	await api.delete(`auth/${_username}`);
 	await fetchAuths();
 };

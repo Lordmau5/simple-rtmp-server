@@ -10,6 +10,16 @@
                     <div class="text-h6">{{ username }}</div>
                 </q-card-section>
 
+                <q-card-section>
+                    <q-input
+                        label="Copy (if button doesn't work)"
+                        filled
+                        :model-value="getStreamForCopy(username)"
+                        @focus="(event) => event.target.select()"
+                        @update:model-value="() => {}"
+                    ></q-input>
+                </q-card-section>
+
                 <q-card-actions align="right" class="q-mt-auto q-mx-sm">
                     <q-btn
                         color="primary"
@@ -37,8 +47,10 @@ const fetchStreams = async () => {
 	streams.value = res.data;
 };
 
+const getStreamForCopy = (username) => `rtmp://${window.location.hostname}/live/${username}`;
+
 const copyStream = (username) => {
-	copy(`rtmp://lordmau5.com/live/${username}`);
+	copy(getStreamForCopy(username));
 };
 
 onMounted(() => {
