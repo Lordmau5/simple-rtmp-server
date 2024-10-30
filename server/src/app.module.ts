@@ -14,11 +14,11 @@ import { MediaServerModule } from 'src/media-server/media-server.module';
 		ConfigModule.forRoot({
 			envFilePath: ['.env'],
 			validationSchema: Joi.object({
-				WEB_PORT: Joi.number().required().default(3000),
-				RTMP_PORT: Joi.number().required().default(1995),
+				WEB_PORT: Joi.number().default(3000),
+				RTMP_PORT: Joi.number().default(1995),
 				NODE_ENV: Joi.string()
 					.valid('development', 'production')
-					.default('development'),
+					.default('production'),
 				PASSWORD: Joi.string().default('admin'),
 			}),
 			validationOptions: {
