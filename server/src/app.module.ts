@@ -14,8 +14,8 @@ import { MediaServerModule } from 'src/media-server/media-server.module';
 		ConfigModule.forRoot({
 			envFilePath: ['.env'],
 			validationSchema: Joi.object({
-				WEB_PORT: Joi.number().required(),
-				RTMP_PORT: Joi.number().required(),
+				WEB_PORT: Joi.number().required().default(3000),
+				RTMP_PORT: Joi.number().required().default(1995),
 				NODE_ENV: Joi.string()
 					.valid('development', 'production')
 					.default('development'),
@@ -34,4 +34,4 @@ import { MediaServerModule } from 'src/media-server/media-server.module';
 		MediaServerModule,
 	],
 })
-export class AppModule {}
+export class AppModule { }
