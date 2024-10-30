@@ -6,7 +6,23 @@ import {
 	NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 
+import { stat, copyFile } from 'fs/promises';
+import { join } from 'path';
+
+async function copyEnvIfNotExists() {
+	const envFilePath = join(__dirname, '../.env');
+	const defaultEnvFilePath = join(__dirname, '../.env.default');
+
+	try {
+		await stat(envFilePath);
+	} catch {
+		await copyFile(defaultEnvFilePath, envFilePath);
+	}
+}
+
 async function bootstrap() {
+	await copyEnvIfNotExists();
+
 	Database.read();
 
 	const app = await NestFactory.create<NestFastifyApplication>(
