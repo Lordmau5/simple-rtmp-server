@@ -1,58 +1,52 @@
 #!/bin/bash
 
-# Capture the password argument if provided
-PASSWORD=${1:-admin} # Default to 'admin' if no argument is passed
+# Set password from the first argument, default to 'admin'
+PASSWORD=${1:-admin}
 
-# Prompt user for confirmation
-echo "This script will install NVM, Node 20, and pm2."
-echo "The password will be set to: ${1:-admin}. Do you want to proceed? (Y/N) [Default: Y]"
+# Inform user about the installation process and password
+echo "This script will install Node 20 and pm2."
+echo "The password will be set to: ${1:-admin}. Do you want to proceed? (Y/n)"
 read -r RESPONSE
+RESPONSE=${RESPONSE:-Y}  # Default response is 'Y' if not provided
 
-# Set default response to 'Y' if no input is provided
-RESPONSE=${RESPONSE:-Y}
-
+# Check if user wants to proceed with installation
 if [[ ! "$RESPONSE" =~ ^[Yy]$ ]]; then
-  echo "Installation aborted."
-  exit 1
+	echo "Installation aborted."
+	exit 1
 fi
 
-# Install NVM
+# Enable color prompt in bash
+sed -i 's/^#force_color_prompt=.*/force_color_prompt=yes/' ~/.bashrc
+
+# Install NVM (Node Version Manager)
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"  # Set NVM directory
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load NVM if installed
+nvm install 20  # Install Node.js version 20
 
-# Add and load NVM
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-# Install node 20
-nvm install 20
-
-# Run the setup
+# Run npm setup script
 npm run setup
 
 # Install pm2 globally
 npm install -g pm2
 
-# Source .bashrc and export path to make pm2 available now
-source ~/.bashrc
-export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version)/bin"
-
-# Make pm2 start on system startup
-pm2 startup
-
-# Copy default .env file and set password
+# Navigate to server directory
 cd server
+# Copy default environment config
 cp .env.default .env
+# Update password in environment file
 sed -i "s/PASSWORD=admin/PASSWORD=$PASSWORD/" .env
+cd ..  # Return to previous directory
 
-# Go back to project root
-cd ..
-
-# Start the server as a PM2 instance
+# Start the application using pm2
 pm2 start "npm start" --name "RTMP"
+pm2 save  # Save pm2 process list
 
-# Save the process just in case the server reboots
-pm2 save
-
-# Final message
+# Inform user that setup is complete
 echo "Setup complete, and the server has been started! Password set to: $PASSWORD"
-echo "It is suggested to log out and back in for full functionality."
+
+# Reload the bash configuration to use the new settings
+exec bash
+
+# Remove the install script
+rm -f install.sh
