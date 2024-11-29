@@ -129,8 +129,23 @@ const addAuth = async () => {
 const getAuthForCopy = (_username, _password) => `${_username}?pass=${_password}`;
 
 const copyAuth = (_username, _password) => {
-	navigator.clipboard.writeText(getAuthForCopy(_username, _password));
 	quasar.notify('Stream key copied to clipboard.');
+	if (!navigator.clipboard) {
+		// Fallback
+		const textArea = document.createElement('textarea');
+		textArea.value = getAuthForCopy(_username, _password);
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		try {
+			document.execCommand('copy');
+		} catch (err) {
+			console.error('Unable to copy to clipboard', err);
+		}
+		document.body.removeChild(textArea);
+		return;
+	}
+	navigator.clipboard.writeText(getAuthForCopy(_username, _password));
 };
 
 const removeAuth = async (_username) => {

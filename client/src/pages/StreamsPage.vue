@@ -50,8 +50,23 @@ const fetchStreams = async () => {
 const getStreamForCopy = (username) => `rtmp://${window.location.hostname}/live/${username}`;
 
 const copyStream = (username) => {
-	navigator.clipboard.writeText(getStreamForCopy(username));
 	quasar.notify('Stream URL copied to clipboard.');
+	if (!navigator.clipboard) {
+		// Fallback
+		const textArea = document.createElement('textarea');
+		textArea.value = getStreamForCopy(username);
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		try {
+			document.execCommand('copy');
+		} catch (err) {
+			console.error('Unable to copy to clipboard', err);
+		}
+		document.body.removeChild(textArea);
+		return;
+	}
+	navigator.clipboard.writeText(getStreamForCopy(username));
 };
 
 onMounted(() => {
