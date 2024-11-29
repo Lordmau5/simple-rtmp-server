@@ -36,9 +36,9 @@ import {
 	onMounted, ref,
 } from 'vue';
 import { api } from 'boot/axios';
-import { useClipboard } from '@vueuse/core';
+import { useQuasar } from 'quasar';
 
-const { copy } = useClipboard();
+const quasar = useQuasar();
 
 const streams = ref([]);
 
@@ -50,7 +50,8 @@ const fetchStreams = async () => {
 const getStreamForCopy = (username) => `rtmp://${window.location.hostname}/live/${username}`;
 
 const copyStream = (username) => {
-	copy(getStreamForCopy(username));
+	navigator.clipboard.writeText(getStreamForCopy(username));
+	quasar.notify('Stream URL copied to clipboard.');
 };
 
 onMounted(() => {

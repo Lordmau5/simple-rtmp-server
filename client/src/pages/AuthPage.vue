@@ -1,8 +1,6 @@
 <template>
     <q-page>
-        <div
-            class="row q-pa-md"
-        >
+        <div class="row q-pa-md">
             <q-card
                 v-for="(password, username) in auths"
                 :key="username"
@@ -78,13 +76,11 @@
 </template>
 
 <script setup>
-import { useClipboard } from '@vueuse/core';
 import { api } from 'boot/axios';
-import {
-	computed, onMounted, ref,
-} from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useQuasar } from 'quasar';
 
-const { copy } = useClipboard();
+const quasar = useQuasar();
 
 const regex = /[^A-Za-z0-9]/g;
 
@@ -92,8 +88,10 @@ const auths = ref([]);
 const username = ref('');
 const submittingAuth = ref(false);
 const authRules = [
-	(text) => (text.length >= 4 && text.length <= 24) || 'Between 4 and 24 characters',
-	(text) => !regex.test(text) || 'Only alphanumerical characters (A-Z, a-z and 0-9)',
+	(text) => (text.length >= 4 && text.length <= 24)
+		|| 'Between 4 and 24 characters',
+	(text) => !regex.test(text)
+		|| 'Only alphanumerical characters (A-Z, a-z and 0-9)',
 ];
 
 const addAuthValid = computed(() => {
@@ -131,7 +129,8 @@ const addAuth = async () => {
 const getAuthForCopy = (_username, _password) => `${_username}?pass=${_password}`;
 
 const copyAuth = (_username, _password) => {
-	copy(getAuthForCopy(_username, _password));
+	navigator.clipboard.writeText(getAuthForCopy(_username, _password));
+	quasar.notify('Stream key copied to clipboard.');
 };
 
 const removeAuth = async (_username) => {
@@ -140,5 +139,4 @@ const removeAuth = async (_username) => {
 };
 
 onMounted(() => fetchAuths());
-
 </script>
