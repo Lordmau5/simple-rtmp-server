@@ -4,6 +4,9 @@ A simple RTMP server using NestJS, Vue and node-media-server
 To get started, clone this repository and run the `install.sh` script.  
 Afterwards the server will be running as a pm2 process called `RTMP`.
 
+Please keep in mind that the install script is very tailor made to a quick deploy on a server.  
+It has SSL support as well, either by providing the files manually in the main folder (key.pem and cert.pem) or automated through Cloudflare DNS and acme.sh.
+
 ```bash
 git clone https://github.com/Lordmau5/simple-rtmp-server
 cd simple-rtmp-server
