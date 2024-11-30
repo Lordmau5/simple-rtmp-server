@@ -6,7 +6,7 @@ import {
 	NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 
-import { stat, copyFile } from 'fs/promises';
+import { stat, copyFile, readFile } from 'fs/promises';
 import { join } from 'path';
 
 async function copyEnvIfNotExists() {
@@ -20,6 +20,24 @@ async function copyEnvIfNotExists() {
 	}
 }
 
+async function loadCertificates() {
+	// Get the key and cert from the main git folder
+	const keyPath = join(__dirname, '../../key.pem');
+	const certPath = join(__dirname, '../../cert.pem');
+
+	try {
+		await stat(keyPath);
+		await stat(certPath);
+
+		const key = await readFile(keyPath);
+		const cert = await readFile(certPath);
+
+		return { key, cert };
+	} catch {
+		return undefined;
+	}
+}
+
 async function bootstrap() {
 	await copyEnvIfNotExists();
 
@@ -27,7 +45,9 @@ async function bootstrap() {
 
 	const app = await NestFactory.create<NestFastifyApplication>(
 		AppModule,
-		new FastifyAdapter(),
+		new FastifyAdapter({
+			https: await loadCertificates()
+		}),
 	);
 	app.setGlobalPrefix('api');
 
@@ -36,7 +56,10 @@ async function bootstrap() {
 	}
 
 	const port = Number(process.env.WEB_PORT);
-	await app.listen(port, '0.0.0.0');
+	await app.listen({
+		port,
+		host: '0.0.0.0',
+	});
 	console.log(`Webserver listening on port ${port}`);
 }
 bootstrap();
