@@ -170,12 +170,9 @@ if dialog --yesno "The web interface password will be set to \"$PASSWORD\" and w
 	sed -i "s/PASSWORD=admin/PASSWORD=$PASSWORD/" .env
 	sed -i "s/WEB_PORT=3000/WEB_PORT=$WEB_PORT/" .env
 	cd ..
-	if [ -z $(pm2 pid "RTMP") ]; then
-		pm2 start "npm start" --name "RTMP"
-		pm2 save
-	else
-		dialog --msgbox "Error: A process with the name 'RTMP' is already running." 6 40
-	fi
+
+	pm2 start "npm start" --name "RTMP"
+	pm2 save
 
 	dialog --msgbox "Setup complete, and the server has been started!" 6 40
 	dialog --msgbox "Web interface password set to \"$PASSWORD\" and web port set to :$WEB_PORT" 6 40
