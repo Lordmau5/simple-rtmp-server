@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Check if dialog or jq are installed
+# Check if the necessary tools (dialog and jq) are installed
 if ! command -v dialog &>/dev/null || ! command -v jq &>/dev/null; then
 	echo "This script requires 'dialog' and 'jq' for proper execution."
 	read -p "Would you like to install them? (Default: Yes) [Y/n]: " response
@@ -15,11 +15,13 @@ if ! command -v dialog &>/dev/null || ! command -v jq &>/dev/null; then
 	fi
 fi
 
+# Function to get the server's public IP address
 get_public_ip() {
 	IP=$(curl -s http://ipv4.icanhazip.com)
 	echo "$IP"
 }
 
+# Function to install acme.sh and obtain SSL certificate
 install_acme_and_get_cert() {
 	dialog --infobox "Installing acme.sh..." 5 40
 	git clone https://github.com/acmesh-official/acme.sh.git ~/.acme.sh
@@ -31,16 +33,20 @@ install_acme_and_get_cert() {
 		--accountemail "${ACCOUNT_EMAIL}"
 }
 
+# Clear the terminal before starting the dialog-based interface
 clear
 
+# Display a welcome message
 dialog --title "Welcome" --msgbox "Simple RTMP Server Installer" 6 40
 
+# Ask the user if they want to set up SSL/TLS for the server
 if dialog --yesno "Do you want to set up SSL? (Using Cloudflare and acme.sh)" 7 50; then
 	SSL_SETUP=true
 else
 	SSL_SETUP=false
 fi
 
+# If SSL setup is confirmed, gather further information
 if [ "$SSL_SETUP" = true ]; then
 	DOMAIN=$(dialog --inputbox "Enter your domain name (e.g. themeathon.com):" 8 50 3>&1 1>&2 2>&3)
 	SUBDOMAIN=$(dialog --inputbox "Enter subdomain (e.g. us.rtmp):" 8 50 3>&1 1>&2 2>&3)
@@ -53,6 +59,7 @@ if [ "$SSL_SETUP" = true ]; then
 	CONFIRM_MESSAGE+="Account Email: $ACCOUNT_EMAIL\n"
 	CONFIRM_MESSAGE+="Cloudflare API Token: $CF_Token\n"
 
+	# Confirm user inputs
 	if dialog --yesno "$CONFIRM_MESSAGE\nDo you want to proceed with these entries?" 15 50; then
 		:
 	else
@@ -60,6 +67,7 @@ if [ "$SSL_SETUP" = true ]; then
 		exit 1
 	fi
 
+	# Fetch the public IPv4 address
 	dialog --infobox "Fetching public IPv4 address..." 5 40
 	PUBLIC_IP=$(get_public_ip)
 
@@ -70,6 +78,7 @@ if [ "$SSL_SETUP" = true ]; then
 
 	dialog --msgbox "Public IPv4 Address: $PUBLIC_IP" 6 40
 
+	# Retrieve the Zone ID from Cloudflare using the provided Domain
 	dialog --infobox "Retrieving Zone ID for domain: $DOMAIN..." 5 40
 	ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${DOMAIN}" \
 		-H "Authorization: Bearer ${CF_Token}" \
@@ -82,6 +91,7 @@ if [ "$SSL_SETUP" = true ]; then
 
 	dialog --msgbox "Zone ID: $ZONE_ID" 6 40
 
+	# Retrieve the DNS Record ID for the specified subdomain
 	dialog --infobox "Retrieving DNS Record ID for subdomain: ${SUBDOMAIN}.${DOMAIN}..." 5 40
 	DNS_RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?name=${SUBDOMAIN}.${DOMAIN}" \
 		-H "Authorization: Bearer ${CF_Token}" \
@@ -94,6 +104,7 @@ if [ "$SSL_SETUP" = true ]; then
 
 	dialog --msgbox "DNS Record ID: $DNS_RECORD_ID" 6 40
 
+	# Check if DNS Record ID is valid, create or update DNS A Record accordingly
 	if [[ -z "$DNS_RECORD_ID" || "$DNS_RECORD_ID" == "null" ]]; then
 		dialog --infobox "Creating new DNS A Record..." 5 40
 		RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records" \
@@ -120,6 +131,7 @@ if [ "$SSL_SETUP" = true ]; then
 			}")
 	fi
 
+	# Check Cloudflare API response and proceed with SSL installation if successful
 	if echo "$RESPONSE" | jq -e '.success' >/dev/null; then
 		dialog --msgbox "Successfully updated ${SUBDOMAIN}.${DOMAIN} to ${PUBLIC_IP}." 6 40
 	else
@@ -130,9 +142,11 @@ if [ "$SSL_SETUP" = true ]; then
 	install_acme_and_get_cert
 fi
 
+# Enable color prompt in bash
 dialog --infobox "Enabling color prompt in bash..." 5 40
 sed -i 's/^#force_color_prompt=.*/force_color_prompt=yes/' ~/.bashrc
 
+# Prompt for the web interface password and set default values
 PASSWORD=$(dialog --inputbox "Enter the web interface password (default: admin):" 8 50 3>&1 1>&2 2>&3)
 PASSWORD=${PASSWORD:-admin}
 if [ "$SSL_SETUP" = true ]; then
@@ -143,14 +157,17 @@ else
 	WEB_PORT=${WEB_PORT:-80}
 fi
 
+# Check if the user wants to install NVM and Node.js
 if dialog --yesno "Do you want to install NVM and Node.js 20?" 7 50; then
 	INSTALL_NVM=true
 else
 	INSTALL_NVM=false
 fi
 
+# Confirm the configuration settings and proceed
 if dialog --yesno "The web interface password will be set to \"$PASSWORD\" and will run on port :$WEB_PORT. Do you want to proceed?" 7 50; then
 	if [ "$INSTALL_NVM" = true ]; then
+		# Install NVM if desired
 		dialog --infobox "Installing NVM..." 5 40
 		wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 		export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
@@ -159,28 +176,40 @@ if dialog --yesno "The web interface password will be set to \"$PASSWORD\" and w
 		nvm install 20
 	fi
 
+	# Run the npm setup script
 	dialog --infobox "Running npm setup script..." 5 40
 	npm run setup
 
+	# Install pm2 globally
 	dialog --infobox "Installing pm2 globally..." 5 40
 	npm install -g pm2
 
+	# Configure the server environment and settings
 	cd server
 	cp .env.default .env
 	sed -i "s/PASSWORD=admin/PASSWORD=$PASSWORD/" .env
 	sed -i "s/WEB_PORT=3000/WEB_PORT=$WEB_PORT/" .env
 	cd ..
 
+	# Start the pm2 process
 	pm2 start "npm start" --name "RTMP"
+
+	# Save the pm2 process list
 	pm2 save
 
+	# Inform the user that setup is complete
 	dialog --msgbox "Setup complete, and the server has been started!" 6 40
 	dialog --msgbox "Web interface password set to \"$PASSWORD\" and web port set to :$WEB_PORT" 6 40
 
+	# Restart the shell to ensure shell environment updates are sourced
 	exec bash
 
+	# Clean up the install script
 	rm -f install.sh
 else
+	# If the user cancels, abort the installation
 	dialog --msgbox "Installation aborted." 6 40
 	exit 1
 fi
+
+# TODO: Only prompt for node 20 installation if it's not already found
