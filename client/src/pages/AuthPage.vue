@@ -34,7 +34,7 @@
                         color="primary"
                         @click="copyAuth(username, password)"
                     >
-                        Copy To Clipboard
+                        Copy Stream Key
                     </q-btn>
                     <q-space></q-space>
                     <q-btn color="negative" @click="removeAuth(username)">

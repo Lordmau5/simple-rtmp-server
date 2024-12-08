@@ -1,6 +1,6 @@
 {
 	"name": "simple-rtmp-server",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "A simple RTMP server using NestJS, Vue and node-media-server",
 	"author": "Lordmau5",
 	"private": true,
